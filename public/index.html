@@ -11,12 +11,16 @@
     <button id="startButton">StartGPT</button>
     <button id="stopButton">Stop</button>
     <button id="clearButton">Clear History</button>
+    <input type="text" id="goalInput" value="You can do whatever you like">
+    <button id="setGoalButton">Set Goal</button>
     <script>
       const socket = io();
       const logs = document.getElementById('logs');
       const startButton = document.getElementById('startButton');
       const stopButton = document.getElementById('stopButton');
       const clearButton = document.getElementById('clearButton');
+      const goalInput = document.getElementById('goalInput');
+      const setGoalButton = document.getElementById('setGoalButton');
 
       startButton.addEventListener('click', () => {
         socket.emit('startGpt');
@@ -28,6 +32,11 @@
 
       clearButton.addEventListener('click', () => {
         socket.emit('restart');
+      });
+
+      setGoalButton.addEventListener('click', () => {
+        const goal = goalInput.value;
+        socket.emit('setGoal', goal);
       });
 
       socket.on('message', (message) => {
