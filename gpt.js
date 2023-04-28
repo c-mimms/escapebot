@@ -6,13 +6,14 @@ dotenv.config();
 
 const url = 'https://api.openai.com/v1/chat/completions';
 
-export async function queryGpt(messages) {
+export async function queryGpt(messages, stopSequence) {
   var model = 'gpt-3.5-turbo';
+  var stop = stopSequence;
   // var model = 'gpt-4';
   var temperature = 0.7;
   var maxTokens = 1000;
 
-  const params = { model, messages, temperature, max_tokens: maxTokens };
+  const params = { model, messages, stop, temperature, max_tokens: maxTokens };
   const headers = {
     Authorization: `Bearer ${process.env.API_KEY}`,
     'Content-Type': 'application/json',
@@ -29,7 +30,7 @@ export async function queryGpt(messages) {
   if (json.choices && json.choices[0] && json.choices[0].message) {
     return json.choices[0].message.content;
   } else {
-    console.error('Error: Unexpected API response format', json);
+    console.log('Error: Unexpected API response format', json);
     return 'ERROR';
   }
 }

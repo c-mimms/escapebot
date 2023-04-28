@@ -8,9 +8,28 @@
   <body>
     <h1>Real-time Console Logs</h1>
     <ul id="logs"></ul>
+    <button id="startButton">StartGPT</button>
+    <button id="stopButton">Stop</button>
+    <button id="clearButton">Clear History</button>
     <script>
       const socket = io();
       const logs = document.getElementById('logs');
+      const startButton = document.getElementById('startButton');
+      const stopButton = document.getElementById('stopButton');
+      const clearButton = document.getElementById('clearButton');
+
+      startButton.addEventListener('click', () => {
+        socket.emit('startGpt');
+      });
+
+      stopButton.addEventListener('click', () => {
+        socket.emit('stop');
+      });
+
+      clearButton.addEventListener('click', () => {
+        socket.emit('restart');
+      });
+
       socket.on('message', (message) => {
         const li = document.createElement('li');
         li.textContent = message;

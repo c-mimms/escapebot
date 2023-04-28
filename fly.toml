@@ -1,23 +1,26 @@
-# fly.toml app configuration file generated for escapebot on 2023-04-27T22:28:36-04:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# fly.toml file generated for escapebot on 2023-04-28T02:48:06Z
 
 app = "escapebot"
+kill_signal = "SIGINT"
+kill_timeout = 5
+mounts = []
 primary_region = "iad"
+processes = []
 
-[env]
-  PORT = "8080"
-
-[http_service]
+[[services]]
   internal_port = 8080
-  force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
+  processes = ["app"]
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
 
-[checks]
-  [checks.alive]
-    type = "tcp"
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "5s"
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
