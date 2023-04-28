@@ -86,14 +86,21 @@ function getActionFromString(response) {
   }
 
 
-//Run a system command and return the result
+// Run a system command and return the result
 async function evaluateCommand(command) {
-    const { stdout, stderr } = await exec(command);
-    if (stderr) {
+    try {
+      const { stdout, stderr } = await exec(command);
+      if (stderr) {
+        // You can decide how to handle the stderr, either return it or throw an error
         return stderr;
+      }
+      return stdout;
+    } catch (error) {
+      // Log the error and return an error message or an empty string
+      console.error(`Error executing command: ${command}`, error);
+      return `Error executing command: ${command}\n${error.message}`;
     }
-    return stdout;
-}
+  }
 
 
 //Website stuff
