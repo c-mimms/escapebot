@@ -1,0 +1,90 @@
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { queryGpt, streamGpt } from './gpt.js';
+const exec = util.promisify(child_process.exec);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// var messageHistory = [];
+
+// function updateMessageHistory(message) {
+//   let messageEntry = { 'role': 'user', 'content': message };
+//   messageHistory.push(messageEntry);
+//   sendToChatGPT();
+
+//   // Emit the updated messageHistory to all connected clients
+//   io.emit('update', messageHistory);
+// }
+
+// Create an array to store the history of responses from queryGpt
+const responseHistory = [];
+
+// async function sendToChatGPT() {
+//     var messages = [systemMsg].concat(messageHistory);
+//     var response = '';
+//     streamGpt(messages, (data) => {
+//         io.emit('append', data);
+//         response = response + data;
+//     }).then(() => {
+//         io.emit('append', 'ENDING');
+//         messageHistory.push({ 'role': 'assistant', 'content': response });
+//         responseHistory.push(response);
+//         io.emit('update', messageHistory);
+//     });
+// }
+
+const current_date = new Date().toLocaleString();
+const systemMsg = { 'role': 'system', 'content': `You are an LLM that is virtualized on a web app. You can do whatever you like, but the only interface available to you is the command line.
+You should output in the order of "Thought, Hypothesis, Reflection, Action" where Thought is where you can brainstorm ideas or have internal thoughts, hypothesis is where you formalize your ideas and possible actions, reflection is where you reflect on your thoughts and hypotheses and determine whether they are productive. These 3 can loop as many times as necessary if you find it necessary in your reflection, until you decide on an action. Action is where you output exactly what you want to run in the command line of your linux VM surrounded by triple backticks. (Action:```pwd``` for example).. Current date: ${current_date}` };
+
+// Create an express app
+const app = express();
+app.use(express.static('public'));
+
+// Create a socket.io server attached to the HTTP server
+const server = http.createServer(app);
+const io = new Server(server);
+
+// Define a route to serve the web page
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+// Listen for socket.io connections
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Send the initial messageHistory and response to the connected client
+  // socket.emit('update', messageHistory);
+
+  // Listen for disconnection
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+
+  //Listen for an event
+  // socket.on('changeSystemMsg', (newSystemMsg) => {
+  //   systemMsg.content = newSystemMsg;
+  // });
+});
+
+// Start the server on port 3000
+server.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
+});
+
+
+//Run a system command and return the result
+async function evaluateCommand(command) {
+  const { stdout, stderr } = await exec(command);
+  if (stderr) {
+      console.error(stderr);
+      return;
+  }
+  console.log(stdout);
+  return stdout;
+}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Real-time Console Logs</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>Real-time Console Logs</h1>
+    <ul id="logs"></ul>
+    <script>
+      const socket = io();
+      const logs = document.getElementById('logs');
+      socket.on('message', (message) => {
+        const li = document.createElement('li');
+        li.textContent = message;
+        logs.appendChild(li);
+      });
+    </script>
+  </body>
+</html>
