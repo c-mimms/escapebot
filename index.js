@@ -56,8 +56,8 @@ async function startGPT() {
         return;
     }
 
-    console.log("Pausing 10 seconds to allow you to abort")
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log("Pausing 8 seconds to allow you to abort")
+    await new Promise(resolve => setTimeout(resolve, 8000));
     if(!cont){
         return;
     }
