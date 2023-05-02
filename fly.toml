@@ -7,6 +7,9 @@ mounts = []
 primary_region = "iad"
 processes = []
 
+[deploy]
+  strategy = "immediate"
+
 [[services]]
   internal_port = 8080
   processes = ["app"]

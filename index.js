@@ -19,8 +19,6 @@ function logWithSocket(message) {
     io.emit('message', `${new Date().toISOString()}: ${message}`);
 }
 
-console.log = logWithSocket;
-
 //GPT stuff
 var gptGoal = 'You can do whatever you like';
 function getSystemMessage(){
@@ -47,28 +45,28 @@ async function startGPT() {
     //Start the loop
     var response = await queryGpt(messageHistory, "Observation:")
     messageHistory.push({ 'role': 'assistant', 'content': response });
-    console.log(response);
+    logWithSocket(response);
 
     //Get and run command
     var action = getActionFromString(response);
     if(action == null){
-        console.log("No action found");
+        logWithSocket("No action found");
         return;
     }
 
-    console.log("Pausing 8 seconds to allow you to abort")
+    logWithSocket("Pausing 8 seconds to allow you to abort")
     await new Promise(resolve => setTimeout(resolve, 8000));
     if(!cont){
         return;
     }
-    console.log("Continuing")
+    logWithSocket("Continuing")
 
     var observation = await evaluateCommand(action);
-    console.log('Console output: ' + observation);
+    logWithSocket('Console output: ' + observation);
     messageHistory.push({ 'role': 'user', 'content': 'Observation: ' + observation });
 
     loops++;
-    console.log('Number of loops : ' + loops);
+    logWithSocket('Number of loops : ' + loops);
     startGPT();
 }
 
@@ -115,34 +113,34 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log(`Socket ${socket.id} connected`);
+    logWithSocket(`Socket ${socket.id} connected`);
 
     //Listen for an event
     socket.on('startGpt', () => {
         cont = true;
-        console.log(getSystemMessage().content);
+        logWithSocket(getSystemMessage().content);
         startGPT()
     });
 
     socket.on('stop', () => {
-        console.log('Stopping GPT');
+        logWithSocket('Stopping GPT');
         cont = false;
     });
 
     socket.on('restart', () => {
-        console.log('Resetting history and system message');
+        logWithSocket('Resetting history and system message');
         messageHistory = [];
         messageHistory.push(getSystemMessage());
     });
 
     socket.on('setGoal', (goal) => {
-        console.log("New goal: "+ goal);
+        logWithSocket("New goal: "+ goal);
         gptGoal = goal;
         console
     });
 });
 
-console.log('Application started');
+logWithSocket('Application started');
 
 const PORT = process.env.PORT || "8080";
 server.listen(PORT, () => {

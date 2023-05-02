@@ -24,6 +24,7 @@ export async function queryGpt(messages, stopSequence) {
     headers,
     body: JSON.stringify(params),
   });
+  console.log('Response json: ', response);
 
   const json = await response.json();
 
