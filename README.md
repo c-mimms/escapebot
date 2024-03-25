@@ -4,6 +4,9 @@ The LLM has the ability to run arbitrary commands on the command line in order t
 
 Note: This application currently requires Node.js version 18 or higher.
 
+### Example usage
+![Screenshot](screenshots/app.png)
+
 ## Instructions
 1. Run `npm install`
 2. Rename `.env.example` to `.env` and add your OpenAI key
